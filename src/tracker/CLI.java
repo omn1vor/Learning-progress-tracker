@@ -2,6 +2,7 @@ package tracker;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class CLI {
     private final Scanner scanner = new Scanner(System.in);
@@ -29,6 +30,8 @@ public class CLI {
                 findStudent();
             } else if ("statistics".equals(input)) {
                 statistics();
+            } else if ("notify".equals(input)) {
+                showNotifications();
             } else if ("back".equals(input)) {
                 System.out.println("Enter 'exit' to exit the program.");
             } else if (input.isEmpty()) {
@@ -133,5 +136,11 @@ public class CLI {
                 System.out.print(course.getTopLearnersInfo());
             }
         }
+    }
+
+    private void showNotifications() {
+        List<Notification> notifications = Notifications.manager().getNotifications();
+        notifications.forEach(System.out::println);
+        System.out.printf("Total %d students have been notified.", notifications.size());
     }
 }

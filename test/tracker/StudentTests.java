@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -114,5 +115,50 @@ public class StudentTests {
                 1     21        3.5%
                 """;
         assertEquals(stats, course.getTopLearnersInfo());
+    }
+
+    @Test
+    public void gettingNotifications() {
+        students.addStudent("John Doe johnd@email.net");
+        students.addStudent("John Second second@mail.net");
+
+        Program program = new Program();
+        List<String> result;
+        Student student;
+        List<String> inputs;
+
+        inputs = List.of("1 600 400 0 0");
+        for (String input : inputs) {
+            result = students.processInputAddPoints(input);
+            student = students.getById(Integer.parseInt(result.get(0)));
+            assertNotNull(student);
+            program.addPoints(student, result.subList(1, result.size()));
+        }
+
+        Notifications manager = Notifications.manager();
+        List<Notification> notifications = manager.getNotifications();
+        int studentCount = manager.getStudentsCount(notifications);
+        String expected =
+                """
+                To: johnd@email.net
+                Re: Your Learning Progress
+                Hello, John Doe! You have accomplished our Java course!
+                To: johnd@email.net
+                Re: Your Learning Progress
+                Hello, John Doe! You have accomplished our DSA course!
+                Total 1 students have been notified.
+                """;
+        String actual = notifications.stream()
+                .map(Notification::toString)
+                .collect(Collectors.joining(System.lineSeparator(),
+                        "",
+                        String.format("%nTotal %d students have been notified.%n", studentCount)));
+        assertEquals(expected, actual);
+
+        notifications = manager.getNotifications();
+        studentCount = manager.getStudentsCount(notifications);
+        expected = "Total 0 students have been notified.";
+        actual = String.format("Total %d students have been notified.", studentCount);
+        assertEquals(expected, actual);
     }
 }

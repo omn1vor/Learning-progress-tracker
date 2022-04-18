@@ -8,6 +8,7 @@ public class Course {
     private final int totalPoints;
     private final List<Task> tasks = new ArrayList<>();
     private final Set<Student> students = new HashSet<>();
+    private final Set<Student> graduates = new HashSet<>();
 
     public Course(String name, int totalPoints) {
         this.name = name;
@@ -35,6 +36,14 @@ public class Course {
     public void addTask(Task task) {
         tasks.add(task);
         students.add(task.getStudent());
+
+        Student student = task.getStudent();
+        if (!graduates.contains(student)) {
+            if (didGraduate(student)) {
+                Notifications.manager().addGraduation(student, this);
+                graduates.add(student);
+            }
+        }
     }
 
     public static String listToString(List<Course> courses) {
@@ -79,4 +88,10 @@ public class Course {
         return name;
     }
 
+    private boolean didGraduate(Student student) {
+        return tasks.stream()
+                .filter(i -> i.getStudent() == student)
+                .mapToInt(Task::getGrade)
+                .sum() >= totalPoints;
+    }
 }

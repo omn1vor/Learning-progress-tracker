@@ -21,6 +21,10 @@ public class Student {
         return email;
     }
 
+    public String getFullName() {
+        return String.format("%s %s", firstName, lastName);
+    }
+
     @Override
     public String toString() {
         return "Student{" +
