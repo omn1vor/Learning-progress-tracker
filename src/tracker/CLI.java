@@ -139,8 +139,10 @@ public class CLI {
     }
 
     private void showNotifications() {
-        List<Notification> notifications = Notifications.manager().getNotifications();
+        Notifications manager = Notifications.manager();
+        List<Notification> notifications = manager.getNotifications();
+        int studentsCount = manager.getStudentsCount(notifications);
         notifications.forEach(System.out::println);
-        System.out.printf("Total %d students have been notified.", notifications.size());
+        System.out.printf("Total %d students have been notified.", studentsCount);
     }
 }
